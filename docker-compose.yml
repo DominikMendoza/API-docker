@@ -1,0 +1,34 @@
+version: '3.4'
+networks:
+  zendriver:
+services:
+  zendriver.db:
+    container_name: zendriver.db
+    image: mysql:8.0.33
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: zendriver
+      MYSQL_USER: zendriver
+      MYSQL_PASSWORD: zendriver
+    networks:
+      - zendriver
+  zendriver.api:
+    image: zendriver.api
+    build:
+      context: .
+      dockerfile: ZenDriver.API/Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - zendriver.db
+    environment:
+      - DB_HOST=zendriver.db
+      - DB_NAME=zendriver
+      - DB_USER=root
+      - DB_PASSWORD=root
+    restart: on-failure
+    networks:
+      - zendriver
